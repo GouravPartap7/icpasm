@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICAPSM 2026 - Payment Receipt</title>
+  <style>
+    :root {
+      --navy: #183269;
+      --blue: #1870b7;
+      --teal: #0d8585;
+      --line: #dce4ed;
+      --soft: #edf3f8;
+      --text: #34475d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef1f5;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      width: min(1100px, calc(100% - 32px));
+      min-height: 100vh;
+      margin: 24px auto;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 8px 28px rgba(25, 43, 73, .12);
+      overflow: hidden;
+    }
+
+    .receipt { padding: 26px 36px 28px; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+    }
+
+    .konfhub {
+      display: flex;
+      align-items: center;
+      color: var(--navy);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1.5px;
+    }
+
+    .konfhub-mark {
+      width: 44px;
+      height: 44px;
+      margin-right: 8px;
+      color: #1769b2;
+    }
+
+    .konfhub small {
+      display: block;
+      margin-top: 8px;
+      padding-left: 54px;
+      color: #62738c;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+
+    .company {
+      text-align: right;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .company strong { font-size: 15px; }
+
+    .brand-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      min-height: 150px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .conference {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-right: 1px solid var(--line);
+      height: 118px;
+    }
+
+    .conference-mark { width: 94px; height: 94px; flex: 0 0 auto; }
+
+    .conference-name {
+      color: var(--navy);
+      font-size: 47px;
+      font-weight: 800;
+      line-height: .95;
+      letter-spacing: -1px;
+    }
+
+    .conference-name span { color: var(--blue); }
+    .conference-subtitle {
+      margin-top: 10px;
+      max-width: 390px;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .event-meta {
+      display: grid;
+      gap: 14px;
+      padding-left: 46px;
+      font-size: 15px;
+    }
+
+    .meta-item { display: flex; align-items: flex-start; gap: 12px; }
+    .meta-item svg { width: 20px; height: 20px; flex: 0 0 auto; color: var(--navy); }
+
+    h1 {
+      margin: 24px 0 10px;
+      text-align: center;
+      color: var(--navy);
+      font-size: 34px;
+      letter-spacing: 2px;
+    }
+
+    .success {
+      width: max-content;
+      margin: 0 auto 12px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      background: var(--teal);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .success .check {
+      display: inline-grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border-radius: 50%;
+      background: white;
+      color: var(--teal);
+      font-size: 14px;
+      vertical-align: -3px;
+    }
+
+    .thanks {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+    .thanks strong { color: var(--navy); font-size: 16px; }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .card h2 {
+      margin: 0;
+      padding: 10px 14px;
+      background: var(--soft);
+      color: var(--navy);
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+    }
+
+    .card-body { padding: 12px 14px; }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 14px;
+      min-height: 34px;
+      align-items: center;
+      font-size: 14px;
+    }
+    .detail-row .value { border-left: 1px solid var(--line); padding-left: 12px; }
+
+    .event-card, .fee-card { margin-bottom: 14px; }
+    .event-card .detail-row { grid-template-columns: 120px 1fr; min-height: 29px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th { color: var(--navy); }
+    th:last-child, td:last-child { text-align: right; }
+    .grand td {
+      border-bottom: 0;
+      color: var(--navy);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .payment-row {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      align-items: stretch;
+      margin-bottom: 14px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .upi {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px;
+    }
+    .upi-logo { width: 88px; height: 38px; }
+    .upi small { display: block; margin-top: 5px; }
+
+    .qr-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-left: 1px solid var(--line);
+    }
+    #qr { width: 76px; height: 76px; flex: 0 0 auto; }
+    .qr-copy { font-size: 13px; line-height: 1.5; }
+
+    .notice {
+      display: flex;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #6c7a8e;
+    }
+    .info {
+      width: 20px; height: 20px;
+      flex: 0 0 auto;
+      border: 2px solid var(--blue);
+      border-radius: 50%;
+      color: var(--blue);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    .footer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .footer-logo { transform: scale(.78); transform-origin: left bottom; }
+    .signature { text-align: right; }
+    .signature em {
+      display: block;
+      color: #6d6e84;
+      font-family: Georgia, serif;
+      font-size: 24px;
+      transform: rotate(-4deg);
+    }
+    .signature small { font-size: 11px; }
+
+    @media (max-width: 760px) {
+      .page { width: 100%; margin: 0; border-radius: 0; }
+      .receipt { padding: 18px 16px; }
+      .topbar { align-items: flex-start; }
+      .konfhub { font-size: 28px; }
+      .konfhub-mark { width: 36px; height: 36px; }
+      .company { font-size: 10px; }
+      .brand-row { grid-template-columns: 1fr; padding: 18px 0; }
+      .conference { border-right: 0; height: auto; }
+      .conference-mark { width: 72px; height: 72px; }
+      .conference-name { font-size: 36px; }
+      .event-meta { padding: 18px 6px 0; border-top: 1px solid var(--line); margin-top: 18px; }
+      h1 { font-size: 27px; }
+      .details-grid { grid-template-columns: 1fr; }
+      .detail-row { grid-template-columns: 110px 1fr; }
+      .payment-row { grid-template-columns: 1fr; }
+      .qr-box { border-left: 0; border-top: 1px solid var(--line); }
+    }
+
+    @media print {
+      body { background: white; }
+      .page { width: 100%; margin: 0; box-shadow: none; }
+      .receipt { padding: 18px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="receipt">
+      <header class="topbar">
+        <div>
+          <div class="konfhub">
+            <svg class="konfhub-mark" viewBox="0 0 48 48" aria-hidden="true">
+              <path fill="currentColor" d="M4 8h12v12L28 8h7L21 20l16 14H25l-9-8v14H4z"/>
+              <circle cx="12" cy="12" r="4" fill="#1769b2"/><circle cx="12" cy="36" r="4" fill="#1769b2"/>
+            </svg>
+            <span>KonfHub</span>
+          </div>
+          <small>Event Management Made Simple</small>
+        </div>
+        <div class="company">
+          <strong>KonfHub Private Limited</strong><br>
+          GSTIN: 33AAGCK5727HTZ8<br>
+          support@konfhub.com | www.konfhub.com
+        </div>
+      </header>
+
+      <section class="brand-row">
+        <div class="conference">
+          <svg class="conference-mark" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="18" fill="#fff" stroke="#183269" stroke-width="5"/>
+            <circle cx="50" cy="50" r="11" fill="#f6b91b"/>
+            <g fill="none" stroke="#183269" stroke-width="5">
+              <ellipse cx="50" cy="50" rx="43" ry="18"/>
+              <ellipse cx="50" cy="50" rx="43" ry="18" transform="rotate(60 50 50)"/>
+              <ellipse cx="50" cy="50" rx="43" ry="18" transform="rotate(120 50 50)"/>
+            </g>
+            <circle cx="50" cy="50" r="7" fill="#183269"/>
+          </svg>
+          <div>
+            <div class="conference-name">ICAPSM <span>2026</span></div>
+            <div class="conference-subtitle">Seventh International Conference on Advances in Physical Sciences and Materials</div>
+          </div>
+        </div>
+        <div class="event-meta">
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+            <span>23 – 24 October 2026</span>
+          </div>
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span>Kangeyam Institute of Technology,<br>Tamil Nadu, India</span>
+          </div>
+          <div class="meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            <span>https://www.icapasm2026.com</span>
+          </div>
+        </div>
+      </section>
+
+      <h1>PAYMENT RECEIPT</h1>
+      <div class="success"><span class="check">✓</span>Payment Successful</div>
+      <div class="thanks"><strong>Thank you for registering for ICAPSM 2026!</strong><br>This is your official payment receipt. Please save this for your records.</div>
+
+      <div class="details-grid">
+        <section class="card">
+          <h2>Participant Details</h2>
+          <div class="card-body">
+            <div class="detail-row"><span>Name</span><span class="value">Gourav Partap Singh</span></div>
+            <div class="detail-row"><span>Email</span><span class="value">23bcs80317@cuchd.in</span></div>
+            <div class="detail-row"><span>Phone</span><span class="value">+91 87158 16350</span></div>
+            <div class="detail-row"><span>Affiliation</span><span class="value">Chandigarh University</span></div>
+            <div class="detail-row"><span>Registration Type</span><span class="value">Indian Author – With AIP Publication</span></div>
+          </div>
+        </section>
+        <section class="card">
+          <h2>Invoice Details</h2>
+          <div class="card-body">
+            <div class="detail-row"><span>Invoice No.</span><span class="value">KH/ICAPSM2026/11477</span></div>
+            <div class="detail-row"><span>Invoice Date</span><span class="value">27 Oct 2026, 08:32 AM</span></div>
+            <div class="detail-row"><span>Payment Date</span><span class="value">27 Oct 2026, 08:34 AM</span></div>
+            <div class="detail-row"><span>Payment Method</span><span class="value">UPI</span></div>
+            <div class="detail-row"><span>Transaction ID</span><span class="value">608790824861</span></div>
+            <div class="detail-row"><span>Payment Status</span><span class="value">Paid</span></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card event-card">
+        <h2>Event Details</h2>
+        <div class="card-body">
+          <div class="detail-row"><span>Event Name</span><span class="value">Seventh International Conference on Advances in Physical Sciences and Materials 2026 (ICAPSM 2026)</span></div>
+          <div class="detail-row"><span>Event Dates</span><span class="value">23 – 24 October 2026</span></div>
+          <div class="detail-row"><span>Venue</span><span class="value">Kangeyam Institute of Technology, Tamil Nadu, India</span></div>
+          <div class="detail-row"><span>Organizer</span><span class="value">ICAPSM 2026</span></div>
+        </div>
+      </section>
+
+      <section class="card fee-card">
+        <h2>Fee Details</h2>
+        <table>
+          <thead><tr><th>Description</th><th>Amount (INR)</th><th>Total (INR)</th></tr></thead>
+          <tbody>
+            <tr><td>Registration Fee (Indian Author – With AIP Publication)</td><td>₹ 16,500.00</td><td>₹ 16,500.00</td></tr>
+            <tr><td>Processing Fee (4.43%)</td><td>₹ 730.13</td><td>₹ 730.13</td></tr>
+            <tr class="grand"><td>Grand Total</td><td></td><td>₹ 17,230.13</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="payment-row">
+        <div class="upi">
+          <svg class="upi-logo" viewBox="0 0 110 48" aria-label="UPI"><path fill="#1b1b1b" d="M10 38V10l4 5-4-5 12 14-12 14Zm12 0V17l8 7v14h7V23l-15-13v28Zm31-19-11-9v9l11 9 11-9V9l-11 10Zm-11 19V28l11 10 11-10v10H42Zm25-28V28h8V10h-8Zm-6 28V28h14v10H61Z"/></svg>
+          <div><strong style="color:#183269">UPI</strong><small>Powered by Razorpay</small></div>
+        </div>
+        <div class="qr-box">
+          <canvas id="qr" width="76" height="76" aria-label="Receipt verification QR code"></canvas>
+          <div class="qr-copy"><strong>Scan to verify</strong><br><span style="color:#7c8796">This receipt is digitally generated<br>and can be verified using the QR code.</span></div>
+        </div>
+      </section>
+
+      <div class="notice">
+        <div class="info">i</div>
+        <div><strong>We do not store your card or financial information.</strong><br>By registering for this event, you provide consent to share your contact information with event organizers and KonfHub Private Limited for event-related communications.</div>
+      </div>
+
+      <footer class="footer">
+        <div class="footer-logo">
+          <div class="konfhub" style="font-size:30px">
+            <svg class="konfhub-mark" viewBox="0 0 48 48" style="width:34px;height:34px"><path fill="currentColor" d="M4 8h12v12L28 8h7L21 20l16 14H25l-9-8v14H4z"/></svg>
+            <span>KonfHub</span>
+          </div>
+          <small style="padding-left:42px;color:#62738c;font-size:10px">Event Management Made Simple</small>
+        </div>
+        <div class="signature">
+          <em>Thank you!</em>
+          <small>For being a part of ICAPSM 2026</small>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    // Generates a decorative, deterministic verification-style QR pattern.
+    const canvas = document.getElementById("qr");
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, 76, 76);
+    ctx.fillStyle = "#111";
+    const pattern = [
+      "11111110011111001111111",
+      "10000010011110010000001",
+      "1011101000010101011101",
+      "1011101011010101011101",
+      "1011101001011101011101",
+      "1000001000101001000001",
+      "1111111010101011111111",
+      "0000000011101000000000",
+      "1110111010011110111011",
+      "1001110011100101001101",
+      "1101001110111010010110",
+      "0110010111001111101001",
+      "1011111000110010111110",
+      "0000000011011100010101",
+      "1111111010100101111010",
+      "1000001011011001000011",
+      "1011101010010111011101",
+      "1011101001101010010100",
+      "1011101010111101001011",
+      "1000001001010011011100",
+      "1111111011101010110011"
+    ];
+    const size = 76;
+    const moduleSize = 3;
+    const offset = 2;
+    for (let y = 0; y < 21 && y * moduleSize + offset < size; y++) {
+      for (let x = 0; x < 21 && x * moduleSize + offset < size; x++) {
+        if (pattern[y] && pattern[y][x] === "1") ctx.fillRect(offset + x * moduleSize, offset + y * moduleSize, moduleSize, moduleSize);
+      }
+    }
+  </script>
+</body>
+</html>
